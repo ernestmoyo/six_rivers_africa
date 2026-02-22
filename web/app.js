@@ -560,7 +560,7 @@ function initMap() {
 
     satellite.addTo(leafletMap);
 
-    // --- Tanzania country boundary (geoBoundaries ADM0, local) ---
+    // --- Tanzania country boundary (HDX COD-AB ADM0) ---
     const tzCountryGroup = L.layerGroup().addTo(leafletMap);
     fetch('data/tz_adm0.geojson')
         .then(r => r.json())
@@ -568,24 +568,39 @@ function initMap() {
             L.geoJSON(data, {
                 style: { color: '#FFD700', weight: 2.5, fillOpacity: 0, dashArray: '6,3' },
                 onEachFeature: (feature, layer) => {
-                    layer.bindPopup('<strong>United Republic of Tanzania</strong><br>Area: ~945,087 km&sup2;');
+                    layer.bindPopup('<strong>United Republic of Tanzania</strong><br>Area: ~945,087 km&sup2;<br><em>Source: HDX COD-AB</em>');
                 }
             }).addTo(tzCountryGroup);
         })
         .catch(() => console.log('Tanzania country boundary unavailable'));
 
-    // --- Tanzania admin regions (geoBoundaries ADM1, local) ---
+    // --- Tanzania admin regions (HDX COD-AB ADM1, 31 regions) ---
     const tzRegionsGroup = L.layerGroup().addTo(leafletMap);
     fetch('data/tz_adm1.geojson')
         .then(r => r.json())
         .then(data => {
             L.geoJSON(data, {
-                style: { color: '#FFD700', weight: 1, fillOpacity: 0.02, opacity: 0.5 },
+                style: (feature) => {
+                    // Highlight regions containing SRA operational zones
+                    const name = (feature.properties.name || '').toLowerCase();
+                    const isSRA = ['iringa', 'mbeya', 'morogoro', 'lindi', 'ruvuma', 'pwani', 'njombe'].includes(name);
+                    return {
+                        color: isSRA ? '#FFA000' : '#FFD700',
+                        weight: isSRA ? 1.5 : 0.8,
+                        fillOpacity: isSRA ? 0.05 : 0.01,
+                        opacity: isSRA ? 0.7 : 0.4
+                    };
+                },
                 onEachFeature: (feature, layer) => {
-                    const name = feature.properties.shapeName || 'Region';
-                    layer.bindPopup(`<strong>${name} Region</strong>`);
-                    layer.on('mouseover', function() { this.setStyle({ fillOpacity: 0.08, weight: 2 }); });
-                    layer.on('mouseout', function() { this.setStyle({ fillOpacity: 0.02, weight: 1 }); });
+                    const name = feature.properties.name || 'Region';
+                    const pcode = feature.properties.pcode || '';
+                    layer.bindPopup(`<strong>${name} Region</strong><br>P-Code: ${pcode}`);
+                    layer.on('mouseover', function() { this.setStyle({ fillOpacity: 0.12, weight: 2.5, opacity: 0.9 }); });
+                    layer.on('mouseout', function() {
+                        const n = (feature.properties.name || '').toLowerCase();
+                        const sra = ['iringa', 'mbeya', 'morogoro', 'lindi', 'ruvuma', 'pwani', 'njombe'].includes(n);
+                        this.setStyle({ fillOpacity: sra ? 0.05 : 0.01, weight: sra ? 1.5 : 0.8, opacity: sra ? 0.7 : 0.4 });
+                    });
                 }
             }).addTo(tzRegionsGroup);
         })
