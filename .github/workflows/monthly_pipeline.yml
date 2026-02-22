@@ -1,0 +1,105 @@
+# =============================================================================
+# Six Rivers Africa — Monthly Landscape Health Pipeline
+# GitHub Actions Workflow
+#
+# Runs on the 5th of each month (allowing GEE exports to settle).
+# Processes the previous month's data, generates reports, and commits results.
+#
+# Author: Ernest Moyo / 7Square Inc.
+# =============================================================================
+
+name: Monthly Landscape Health Pipeline
+
+on:
+  schedule:
+    # Run at 06:00 UTC on the 5th of each month
+    - cron: '0 6 5 * *'
+
+  workflow_dispatch:
+    inputs:
+      year:
+        description: 'Reporting year (e.g. 2026)'
+        required: true
+        type: string
+      month:
+        description: 'Reporting month (1-12)'
+        required: true
+        type: string
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  process-and-report:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          pip install pandas numpy geopandas
+
+      - name: Determine reporting period
+        id: period
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            YEAR="${{ github.event.inputs.year }}"
+            MONTH="${{ github.event.inputs.month }}"
+          else
+            # Previous month
+            YEAR=$(date -d "last month" +%Y)
+            MONTH=$(date -d "last month" +%-m)
+          fi
+          echo "year=$YEAR" >> $GITHUB_OUTPUT
+          echo "month=$MONTH" >> $GITHUB_OUTPUT
+          echo "Processing period: $YEAR-$MONTH"
+
+      - name: Process GEE exports
+        run: |
+          python python/pipeline/gee_export_processor.py \
+            --year ${{ steps.period.outputs.year }} \
+            --month ${{ steps.period.outputs.month }}
+
+      - name: Generate monthly report
+        run: |
+          python python/analysis/report_generator.py \
+            --year ${{ steps.period.outputs.year }} \
+            --month ${{ steps.period.outputs.month }} \
+            --mode full
+
+      - name: Generate donor brief
+        run: |
+          python python/analysis/report_generator.py \
+            --year ${{ steps.period.outputs.year }} \
+            --month ${{ steps.period.outputs.month }} \
+            --mode donor
+
+      - name: Validate shapefile register
+        run: |
+          python python/utils/shapefile_manager.py --status
+
+      - name: Commit results
+        run: |
+          git config user.name "SRA Pipeline"
+          git config user.email "pipeline@sixriversafrica.org"
+          PERIOD="${{ steps.period.outputs.year }}-$(printf '%02d' ${{ steps.period.outputs.month }})"
+          git add data/monthly/ reports/monthly/
+          git diff --cached --quiet || git commit -m "Monthly landscape health report: $PERIOD"
+          git push
+
+      - name: Summary
+        run: |
+          PERIOD="${{ steps.period.outputs.year }}-$(printf '%02d' ${{ steps.period.outputs.month }})"
+          echo "## Monthly Pipeline Complete" >> $GITHUB_STEP_SUMMARY
+          echo "**Period:** $PERIOD" >> $GITHUB_STEP_SUMMARY
+          echo "**Reports generated:** Full report + Donor brief" >> $GITHUB_STEP_SUMMARY
+          echo "**Boundary status:** PLACEHOLDER" >> $GITHUB_STEP_SUMMARY

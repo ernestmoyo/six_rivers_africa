@@ -1,0 +1,136 @@
+{
+  "project": {
+    "name": "Six Rivers Africa — Landscape Health Intelligence Dashboard",
+    "version": "1.0.0",
+    "organisation": "Six Rivers Africa",
+    "prepared_by": "Ernest Moyo / 7Square Inc.",
+    "pillar": "Research & Restoration",
+    "crs_storage": "EPSG:4326",
+    "crs_analysis": "EPSG:32736",
+    "crs_display": "EPSG:3857",
+    "baseline_period": [2018, 2023],
+    "pixel_resolution_m": 30
+  },
+  "zones": {
+    "zone_1": {
+      "id": "usangu_ihefu",
+      "name": "Usangu Game Reserve / Ihefu Wetland",
+      "short_name": "Usangu GR / Ihefu",
+      "region": "Mbeya Region, Mbarali District",
+      "country": "Tanzania",
+      "authority": "TAWA",
+      "wdpa_id": "20021",
+      "area_km2_indicative": 2500,
+      "ihefu_core_km2_indicative": 350,
+      "boundary_status": "PLACEHOLDER",
+      "shapefiles": {
+        "reserve": "usangu_game_reserve.shp",
+        "wetland_core": "ihefu_swamp_core.shp"
+      },
+      "centroid_indicative": {
+        "lat": -8.65,
+        "lon": 34.00
+      },
+      "bbox_indicative": {
+        "west": 33.20,
+        "south": -9.15,
+        "east": 34.70,
+        "north": -8.10
+      },
+      "key_rivers": ["Great Ruaha River", "Chimala River"],
+      "key_species": [
+        "Elephant", "Buffalo", "Hippopotamus",
+        "Wild Dog", "Lion", "Tigerfish"
+      ],
+      "sra_base": {
+        "name": "Ikoga Airstrip",
+        "lat_indicative": -8.85,
+        "lon_indicative": 34.30,
+        "status": "APPROXIMATE"
+      },
+      "primary_threats": [
+        "Agricultural encroachment",
+        "Seasonal water abstraction"
+      ],
+      "sensitivity_note": "Ihefu Swamp Core is the single most ecologically sensitive spatial unit. MODERATE alerts within Ihefu Core escalate to HIGH priority."
+    },
+    "zone_2": {
+      "id": "nyerere_selous",
+      "name": "Nyerere National Park (Selous Ecosystem)",
+      "short_name": "Nyerere NP (Selous)",
+      "regions": ["Morogoro", "Lindi", "Ruvuma"],
+      "country": "Tanzania",
+      "authority": "TANAPA",
+      "wdpa_id": "1695",
+      "area_km2_indicative": 30893,
+      "boundary_status": "PLACEHOLDER",
+      "shapefiles": {
+        "park": "nyerere_np_boundary.shp"
+      },
+      "centroid_indicative": {
+        "lat": -9.00,
+        "lon": 37.40
+      },
+      "bbox_indicative": {
+        "west": 35.50,
+        "south": -10.80,
+        "east": 39.50,
+        "north": -7.30
+      },
+      "key_rivers": ["Rufiji River", "Great Ruaha River", "Kilombero River"],
+      "key_species": [
+        "Elephant", "Lion", "Wild Dog", "Crocodile",
+        "Hippo", "Sable Antelope"
+      ],
+      "unesco": {
+        "status": "World Heritage Site",
+        "year_inscribed": 1982,
+        "iucn_category": "II"
+      },
+      "primary_threats": [
+        "Poaching",
+        "Charcoal production",
+        "Infrastructure encroachment"
+      ],
+      "sensitivity_note": "HIGH alerts must reference Tanzania's UNESCO World Heritage obligations in government and donor recommendations."
+    }
+  },
+  "alert_thresholds": {
+    "ndvi_evi_moderate": {
+      "deviation_pct": -15,
+      "min_extent_km2": 2,
+      "severity": "MODERATE"
+    },
+    "ndvi_evi_high": {
+      "deviation_pct": -25,
+      "min_extent_km2": 5,
+      "severity": "HIGH"
+    },
+    "fire_any": {
+      "condition": "Any active fire within shapefile boundary",
+      "severity": "HIGH"
+    },
+    "forest_loss_moderate": {
+      "loss_km2_30day": 0.5,
+      "severity": "MODERATE"
+    },
+    "forest_loss_high": {
+      "loss_km2_30day": 2.0,
+      "severity": "HIGH"
+    },
+    "surface_water_ihefu": {
+      "deviation_pct": 25,
+      "severity": "MODERATE",
+      "note": "Escalates to HIGH within Ihefu Core"
+    },
+    "rainfall_deficit": {
+      "deficit_pct": 40,
+      "min_decades": 3,
+      "severity": "HIGH"
+    },
+    "lst_anomaly": {
+      "anomaly_deg_c": 3.0,
+      "severity": "MODERATE"
+    }
+  }
+}

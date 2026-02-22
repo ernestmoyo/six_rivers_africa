@@ -1,0 +1,100 @@
+{
+  "indicators": {
+    "ndvi": {
+      "name": "Normalized Difference Vegetation Index",
+      "abbreviation": "NDVI",
+      "source": "Sentinel-2 / MODIS",
+      "gee_collection": "COPERNICUS/S2_SR_HARMONIZED",
+      "gee_fallback": "MODIS/061/MOD13Q1",
+      "bands": {"nir": "B8", "red": "B4"},
+      "formula": "(NIR - RED) / (NIR + RED)",
+      "range": [-1.0, 1.0],
+      "healthy_range": [0.3, 0.8],
+      "unit": "dimensionless",
+      "temporal_resolution": "monthly",
+      "spatial_resolution_m": 10,
+      "rationale": "Proxy for vegetation productivity, grazing pressure, and habitat quality"
+    },
+    "evi": {
+      "name": "Enhanced Vegetation Index",
+      "abbreviation": "EVI",
+      "source": "MODIS MOD13Q1",
+      "gee_collection": "MODIS/061/MOD13Q1",
+      "band": "EVI",
+      "scale_factor": 0.0001,
+      "range": [-0.2, 1.0],
+      "unit": "dimensionless",
+      "temporal_resolution": "16-day",
+      "spatial_resolution_m": 250,
+      "rationale": "Reduced canopy saturation bias; superior in dense miombo woodland"
+    },
+    "ndwi": {
+      "name": "Normalized Difference Water Index",
+      "abbreviation": "NDWI",
+      "source": "Sentinel-2",
+      "gee_collection": "COPERNICUS/S2_SR_HARMONIZED",
+      "bands": {"green": "B3", "nir": "B8"},
+      "formula": "(GREEN - NIR) / (GREEN + NIR)",
+      "range": [-1.0, 1.0],
+      "unit": "dimensionless",
+      "temporal_resolution": "monthly",
+      "spatial_resolution_m": 10,
+      "rationale": "Quantify open water and wetland health in Ihefu / riparian zones"
+    },
+    "burn_scar": {
+      "name": "Burn Scar Extent",
+      "abbreviation": "FIRMS",
+      "source": "NASA FIRMS / MODIS MCD64",
+      "gee_collection_firms": "FIRMS",
+      "gee_collection_mcd64": "MODIS/061/MCD64A1",
+      "unit": "km2",
+      "temporal_resolution": "daily (FIRMS), monthly (MCD64)",
+      "rationale": "Fire ecology monitoring; illegal burning detection"
+    },
+    "surface_water": {
+      "name": "Surface Water Dynamics",
+      "abbreviation": "JRC_SW",
+      "source": "JRC Global Surface Water",
+      "gee_collection": "JRC/GSW1_4/MonthlyHistory",
+      "unit": "km2",
+      "temporal_resolution": "monthly",
+      "spatial_resolution_m": 30,
+      "rationale": "Seasonal inundation tracking; Ihefu swamp extent monitoring"
+    },
+    "rainfall": {
+      "name": "Rainfall Anomaly",
+      "abbreviation": "CHIRPS",
+      "source": "CHIRPS v2.0",
+      "gee_collection": "UCSB-CHG/CHIRPS/DAILY",
+      "unit": "mm",
+      "temporal_resolution": "daily (aggregated monthly)",
+      "spatial_resolution_m": 5566,
+      "baseline_years": 30,
+      "rationale": "Contextualise vegetation signals; drought / flood risk"
+    },
+    "lst": {
+      "name": "Land Surface Temperature",
+      "abbreviation": "LST",
+      "source": "MODIS MOD11A2",
+      "gee_collection": "MODIS/061/MOD11A2",
+      "band": "LST_Day_1km",
+      "scale_factor": 0.02,
+      "offset_k": -273.15,
+      "unit": "°C",
+      "temporal_resolution": "8-day",
+      "spatial_resolution_m": 1000,
+      "rationale": "Thermal stress on vegetation and wildlife; heat island detection"
+    },
+    "land_cover": {
+      "name": "Land Cover Change",
+      "abbreviation": "LC",
+      "source": "ESA WorldCover / Global Forest Change",
+      "gee_collection_worldcover": "ESA/WorldCover/v200",
+      "gee_collection_gfc": "UMD/hansen/global_forest_change_2023_v1_11",
+      "unit": "km2",
+      "temporal_resolution": "annual",
+      "spatial_resolution_m": 10,
+      "rationale": "Detects deforestation, agricultural expansion, wetland shrinkage"
+    }
+  }
+}

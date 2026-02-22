@@ -1,0 +1,48 @@
+# Environment & secrets
+.env
+.env.*
+credentials.json
+service-account-key.json
+*.pem
+
+# Data files (large binaries tracked via Git LFS or external storage)
+data/shapefiles/*.shp
+data/shapefiles/*.shx
+data/shapefiles/*.dbf
+data/shapefiles/*.prj
+data/shapefiles/*.cpg
+data/geopackage/*.gpkg
+data/exports/*.tif
+data/exports/*.csv
+gee/exports/*.csv
+gee/exports/*.tif
+
+# R artifacts
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+*_cache/
+rsconnect/
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary
+*.tmp
+*.bak
+*.log
