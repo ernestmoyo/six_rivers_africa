@@ -560,29 +560,29 @@ function initMap() {
 
     satellite.addTo(leafletMap);
 
-    // --- Tanzania country boundary (geoBoundaries ADM0) ---
+    // --- Tanzania country boundary (geoBoundaries ADM0, local) ---
     const tzCountryGroup = L.layerGroup().addTo(leafletMap);
-    fetch('https://raw.githubusercontent.com/wmgeolab/geoBoundaries/main/releaseData/gbOpen/TZA/ADM0/geoBoundaries-TZA-ADM0_simplified.geojson')
+    fetch('data/tz_adm0.geojson')
         .then(r => r.json())
         .then(data => {
             L.geoJSON(data, {
                 style: { color: '#FFD700', weight: 2.5, fillOpacity: 0, dashArray: '6,3' },
                 onEachFeature: (feature, layer) => {
-                    layer.bindPopup('<strong>United Republic of Tanzania</strong><br>Area: ~945,087 km²');
+                    layer.bindPopup('<strong>United Republic of Tanzania</strong><br>Area: ~945,087 km&sup2;');
                 }
             }).addTo(tzCountryGroup);
         })
         .catch(() => console.log('Tanzania country boundary unavailable'));
 
-    // --- Tanzania admin regions (geoBoundaries ADM1) ---
+    // --- Tanzania admin regions (geoBoundaries ADM1, local) ---
     const tzRegionsGroup = L.layerGroup().addTo(leafletMap);
-    fetch('https://raw.githubusercontent.com/wmgeolab/geoBoundaries/main/releaseData/gbOpen/TZA/ADM1/geoBoundaries-TZA-ADM1_simplified.geojson')
+    fetch('data/tz_adm1.geojson')
         .then(r => r.json())
         .then(data => {
             L.geoJSON(data, {
                 style: { color: '#FFD700', weight: 1, fillOpacity: 0.02, opacity: 0.5 },
                 onEachFeature: (feature, layer) => {
-                    const name = feature.properties.shapeName || feature.properties.NAME_1 || 'Region';
+                    const name = feature.properties.shapeName || 'Region';
                     layer.bindPopup(`<strong>${name} Region</strong>`);
                     layer.on('mouseover', function() { this.setStyle({ fillOpacity: 0.08, weight: 2 }); });
                     layer.on('mouseout', function() { this.setStyle({ fillOpacity: 0.02, weight: 1 }); });
