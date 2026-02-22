@@ -92,7 +92,7 @@ def format_executive_summary(data: dict) -> str:
         alert_summary = "No HIGH-severity alerts this reporting cycle."
 
     deviations = data.get("deviations", [])
-    ndvi_devs = [d for d in deviations if d.get("indicator") == "NDVI"]
+    ndvi_devs = [d for d in deviations if "NDVI" in d.get("indicator", "") and "stdDev" not in d.get("indicator", "")]
 
     landscape_status = "stable"
     for d in ndvi_devs:
@@ -119,10 +119,11 @@ def format_zone_section(data: dict, zone_key: str, zone_name: str) -> str:
     zone_devs = [d for d in deviations if d.get("zone") == zone_name]
     zone_alerts = [a for a in alerts if a.get("zone") == zone_name]
 
-    # Extract indicator values
-    def get_indicator(name):
+    # Extract indicator values (match partial names, skip stdDev columns)
+    def get_indicator(prefix):
         for d in zone_devs:
-            if d.get("indicator") == name:
+            ind = d.get("indicator", "")
+            if ind.startswith(prefix) and "stdDev" not in ind:
                 return d
         return {"current": "[pending]", "baseline": "[pending]", "deviation_pct": "[pending]"}
 
@@ -138,12 +139,24 @@ def format_zone_section(data: dict, zone_key: str, zone_name: str) -> str:
     elif mod_count > 0:
         alert_status = "MODERATE"
 
+    def fmt(val, suffix=""):
+        """Format a value, replacing NaN/None with N/A."""
+        import math
+        if val is None or val == "[pending]":
+            return "N/A"
+        try:
+            if math.isnan(float(val)):
+                return "N/A"
+        except (TypeError, ValueError):
+            pass
+        return f"{val}{suffix}"
+
     section = f"""
 {zone_name.upper()}
 
   Vegetation Health (NDVI / EVI)
-     Current NDVI mean     : {ndvi.get('current', '[pending]')}  |  Baseline: {ndvi.get('baseline', '[pending]')}  |  Deviation: {ndvi.get('deviation_pct', '[pending]')}%
-     Current EVI mean      : {evi.get('current', '[pending]')}  |  Baseline: {evi.get('baseline', '[pending]')}  |  Deviation: {evi.get('deviation_pct', '[pending]')}%
+     Current NDVI mean     : {fmt(ndvi.get('current'))}  |  Baseline: {fmt(ndvi.get('baseline'))}  |  Deviation: {fmt(ndvi.get('deviation_pct'), '%')}
+     Current EVI mean      : {fmt(evi.get('current'))}  |  Baseline: {fmt(evi.get('baseline'))}  |  Deviation: {fmt(evi.get('deviation_pct'), '%')}
      ALERT STATUS          : {alert_status}
 
   Active Alerts ({len(zone_alerts)} total)

@@ -1,0 +1,553 @@
+{
+  "metadata": {
+    "report_period": "2026-01",
+    "generated_at": "2026-02-22T00:52:36.221657+00:00",
+    "prepared_by": "Ernest Moyo / 7Square Inc.",
+    "organisation": "Six Rivers Africa",
+    "boundary_status": "PLACEHOLDER",
+    "crs_analysis": "EPSG:32736"
+  },
+  "data_quality": {
+    "timestamp": "2026-02-22T00:52:36.214235+00:00",
+    "checks": [
+      {
+        "dataset": "ndvi_evi",
+        "records": 13,
+        "null_pct": 25.0,
+        "zones_present": [
+          "Usangu GR",
+          "Ihefu Core",
+          "Nyerere NP"
+        ],
+        "status": "PASS"
+      },
+      {
+        "dataset": "fire",
+        "records": 6,
+        "null_pct": 16.7,
+        "zones_present": [
+          "Usangu GR",
+          "Ihefu Core",
+          "Nyerere NP"
+        ],
+        "status": "PASS"
+      },
+      {
+        "dataset": "water",
+        "records": 5,
+        "null_pct": 20.0,
+        "zones_present": [
+          "Ihefu Core",
+          "Usangu GR",
+          "Nyerere NP"
+        ],
+        "status": "PASS"
+      },
+      {
+        "dataset": "climate",
+        "records": 12,
+        "null_pct": 16.7,
+        "zones_present": [
+          "Usangu GR",
+          "Ihefu Core",
+          "Nyerere NP"
+        ],
+        "status": "PASS"
+      }
+    ],
+    "overall_status": "PASS"
+  },
+  "deviations": [
+    {
+      "zone": "Usangu GR",
+      "indicator": "NDVI_mean",
+      "current": 0.42,
+      "baseline": 0.51,
+      "deviation_pct": -17.6
+    },
+    {
+      "zone": "Usangu GR",
+      "indicator": "NDVI_stdDev",
+      "current": 0.08,
+      "baseline": 0.06,
+      "deviation_pct": 33.3
+    },
+    {
+      "zone": "Usangu GR",
+      "indicator": "EVI_mean",
+      "current": 0.31,
+      "baseline": 0.38,
+      "deviation_pct": -18.4
+    },
+    {
+      "zone": "Usangu GR",
+      "indicator": "EVI_stdDev",
+      "current": 0.05,
+      "baseline": 0.04,
+      "deviation_pct": 25.0
+    },
+    {
+      "zone": "Ihefu Core",
+      "indicator": "NDVI_mean",
+      "current": 0.38,
+      "baseline": 0.52,
+      "deviation_pct": -26.9
+    },
+    {
+      "zone": "Ihefu Core",
+      "indicator": "NDVI_stdDev",
+      "current": 0.1,
+      "baseline": 0.07,
+      "deviation_pct": 42.9
+    },
+    {
+      "zone": "Ihefu Core",
+      "indicator": "EVI_mean",
+      "current": NaN,
+      "baseline": NaN,
+      "deviation_pct": NaN
+    },
+    {
+      "zone": "Ihefu Core",
+      "indicator": "EVI_stdDev",
+      "current": NaN,
+      "baseline": NaN,
+      "deviation_pct": NaN
+    },
+    {
+      "zone": "Nyerere NP",
+      "indicator": "NDVI_mean",
+      "current": 0.55,
+      "baseline": 0.58,
+      "deviation_pct": -5.2
+    },
+    {
+      "zone": "Nyerere NP",
+      "indicator": "NDVI_stdDev",
+      "current": 0.07,
+      "baseline": 0.05,
+      "deviation_pct": 40.0
+    },
+    {
+      "zone": "Nyerere NP",
+      "indicator": "EVI_mean",
+      "current": 0.39,
+      "baseline": 0.41,
+      "deviation_pct": -4.9
+    },
+    {
+      "zone": "Nyerere NP",
+      "indicator": "EVI_stdDev",
+      "current": 0.04,
+      "baseline": 0.03,
+      "deviation_pct": 33.3
+    },
+    {
+      "zone": "Usangu GR",
+      "indicator": "rainfall_mm",
+      "current": 68.0,
+      "baseline": 112.0,
+      "deviation_pct": -39.3
+    },
+    {
+      "zone": "Usangu GR",
+      "indicator": "LST_celsius",
+      "current": 31.2,
+      "baseline": 28.8,
+      "deviation_pct": 8.3
+    },
+    {
+      "zone": "Ihefu Core",
+      "indicator": "rainfall_mm",
+      "current": 72.0,
+      "baseline": 115.0,
+      "deviation_pct": -37.4
+    },
+    {
+      "zone": "Ihefu Core",
+      "indicator": "LST_celsius",
+      "current": 30.5,
+      "baseline": 28.2,
+      "deviation_pct": 8.2
+    },
+    {
+      "zone": "Nyerere NP",
+      "indicator": "rainfall_mm",
+      "current": 95.0,
+      "baseline": 103.0,
+      "deviation_pct": -7.8
+    },
+    {
+      "zone": "Nyerere NP",
+      "indicator": "LST_celsius",
+      "current": 29.1,
+      "baseline": 28.3,
+      "deviation_pct": 2.8
+    }
+  ],
+  "alerts": [
+    {
+      "zone": "Usangu GR",
+      "indicator": "NDVI",
+      "severity": "MODERATE",
+      "deviation_pct": -17.6,
+      "current": 0.42,
+      "baseline": 0.51,
+      "escalation": null
+    },
+    {
+      "zone": "Usangu GR",
+      "indicator": "EVI",
+      "severity": "MODERATE",
+      "deviation_pct": -18.4,
+      "current": 0.31,
+      "baseline": 0.38,
+      "escalation": null
+    },
+    {
+      "zone": "Ihefu Core",
+      "indicator": "NDVI",
+      "severity": "HIGH",
+      "deviation_pct": -26.9,
+      "current": 0.38,
+      "baseline": 0.52,
+      "escalation": null
+    },
+    {
+      "zone": "Usangu GR",
+      "indicator": "Active Fire",
+      "severity": "HIGH",
+      "detail": "Fire detections: 3",
+      "escalation": null
+    }
+  ],
+  "raw_datasets": {
+    "ndvi_evi": [
+      {
+        "zone": "Usangu GR",
+        "indicator": "NDVI_current",
+        "year": 2026,
+        "month": 1,
+        "NDVI_mean": 0.42,
+        "NDVI_stdDev": 0.08,
+        "EVI_mean": NaN,
+        "EVI_stdDev": NaN
+      },
+      {
+        "zone": "Usangu GR",
+        "indicator": "NDVI_baseline",
+        "year": 2026,
+        "month": 1,
+        "NDVI_mean": 0.51,
+        "NDVI_stdDev": 0.06,
+        "EVI_mean": NaN,
+        "EVI_stdDev": NaN
+      },
+      {
+        "zone": "Usangu GR",
+        "indicator": "NDVI_deviation_pct",
+        "year": 2026,
+        "month": 1,
+        "NDVI_mean": -17.6,
+        "NDVI_stdDev": 5.2,
+        "EVI_mean": NaN,
+        "EVI_stdDev": NaN
+      },
+      {
+        "zone": "Usangu GR",
+        "indicator": "EVI_current",
+        "year": 2026,
+        "month": 1,
+        "NDVI_mean": NaN,
+        "NDVI_stdDev": NaN,
+        "EVI_mean": 0.31,
+        "EVI_stdDev": 0.05
+      },
+      {
+        "zone": "Usangu GR",
+        "indicator": "EVI_baseline",
+        "year": 2026,
+        "month": 1,
+        "NDVI_mean": NaN,
+        "NDVI_stdDev": NaN,
+        "EVI_mean": 0.38,
+        "EVI_stdDev": 0.04
+      },
+      {
+        "zone": "Ihefu Core",
+        "indicator": "NDVI_current",
+        "year": 2026,
+        "month": 1,
+        "NDVI_mean": 0.38,
+        "NDVI_stdDev": 0.1,
+        "EVI_mean": NaN,
+        "EVI_stdDev": NaN
+      },
+      {
+        "zone": "Ihefu Core",
+        "indicator": "NDVI_baseline",
+        "year": 2026,
+        "month": 1,
+        "NDVI_mean": 0.52,
+        "NDVI_stdDev": 0.07,
+        "EVI_mean": NaN,
+        "EVI_stdDev": NaN
+      },
+      {
+        "zone": "Ihefu Core",
+        "indicator": "NDVI_deviation_pct",
+        "year": 2026,
+        "month": 1,
+        "NDVI_mean": -26.9,
+        "NDVI_stdDev": 6.1,
+        "EVI_mean": NaN,
+        "EVI_stdDev": NaN
+      },
+      {
+        "zone": "Nyerere NP",
+        "indicator": "NDVI_current",
+        "year": 2026,
+        "month": 1,
+        "NDVI_mean": 0.55,
+        "NDVI_stdDev": 0.07,
+        "EVI_mean": NaN,
+        "EVI_stdDev": NaN
+      },
+      {
+        "zone": "Nyerere NP",
+        "indicator": "NDVI_baseline",
+        "year": 2026,
+        "month": 1,
+        "NDVI_mean": 0.58,
+        "NDVI_stdDev": 0.05,
+        "EVI_mean": NaN,
+        "EVI_stdDev": NaN
+      },
+      {
+        "zone": "Nyerere NP",
+        "indicator": "NDVI_deviation_pct",
+        "year": 2026,
+        "month": 1,
+        "NDVI_mean": -5.2,
+        "NDVI_stdDev": 3.1,
+        "EVI_mean": NaN,
+        "EVI_stdDev": NaN
+      },
+      {
+        "zone": "Nyerere NP",
+        "indicator": "EVI_current",
+        "year": 2026,
+        "month": 1,
+        "NDVI_mean": NaN,
+        "NDVI_stdDev": NaN,
+        "EVI_mean": 0.39,
+        "EVI_stdDev": 0.04
+      },
+      {
+        "zone": "Nyerere NP",
+        "indicator": "EVI_baseline",
+        "year": 2026,
+        "month": 1,
+        "NDVI_mean": NaN,
+        "NDVI_stdDev": NaN,
+        "EVI_mean": 0.41,
+        "EVI_stdDev": 0.03
+      }
+    ],
+    "fire": [
+      {
+        "zone": "Usangu GR",
+        "indicator": "active_fire_count",
+        "year": 2026,
+        "month": 1,
+        "T21_count": 3.0,
+        "BurnDate_sum": NaN
+      },
+      {
+        "zone": "Ihefu Core",
+        "indicator": "active_fire_count",
+        "year": 2026,
+        "month": 1,
+        "T21_count": 0.0,
+        "BurnDate_sum": NaN
+      },
+      {
+        "zone": "Nyerere NP",
+        "indicator": "active_fire_count",
+        "year": 2026,
+        "month": 1,
+        "T21_count": 0.0,
+        "BurnDate_sum": NaN
+      },
+      {
+        "zone": "Usangu GR",
+        "indicator": "burn_scar_km2",
+        "year": 2026,
+        "month": 1,
+        "T21_count": NaN,
+        "BurnDate_sum": 12.4
+      },
+      {
+        "zone": "Ihefu Core",
+        "indicator": "burn_scar_km2",
+        "year": 2026,
+        "month": 1,
+        "T21_count": NaN,
+        "BurnDate_sum": 0.0
+      },
+      {
+        "zone": "Nyerere NP",
+        "indicator": "burn_scar_km2",
+        "year": 2026,
+        "month": 1,
+        "T21_count": NaN,
+        "BurnDate_sum": 0.0
+      }
+    ],
+    "water": [
+      {
+        "zone": "Ihefu Core",
+        "indicator": "surface_water_km2",
+        "year": 2026,
+        "month": 1,
+        "water_sum": 298.0,
+        "NDWI_mean": NaN,
+        "NDWI_stdDev": NaN
+      },
+      {
+        "zone": "Usangu GR",
+        "indicator": "surface_water_km2",
+        "year": 2026,
+        "month": 1,
+        "water_sum": 420.0,
+        "NDWI_mean": NaN,
+        "NDWI_stdDev": NaN
+      },
+      {
+        "zone": "Ihefu Core",
+        "indicator": "NDWI",
+        "year": 2026,
+        "month": 1,
+        "water_sum": NaN,
+        "NDWI_mean": 0.18,
+        "NDWI_stdDev": 0.12
+      },
+      {
+        "zone": "Usangu GR",
+        "indicator": "NDWI",
+        "year": 2026,
+        "month": 1,
+        "water_sum": NaN,
+        "NDWI_mean": 0.05,
+        "NDWI_stdDev": 0.15
+      },
+      {
+        "zone": "Nyerere NP",
+        "indicator": "NDWI",
+        "year": 2026,
+        "month": 1,
+        "water_sum": NaN,
+        "NDWI_mean": -0.02,
+        "NDWI_stdDev": 0.18
+      }
+    ],
+    "climate": [
+      {
+        "zone": "Usangu GR",
+        "indicator": "CHIRPS_rainfall_current",
+        "year": 2026,
+        "month": 1,
+        "rainfall_mm": 68.0,
+        "LST_celsius": NaN
+      },
+      {
+        "zone": "Usangu GR",
+        "indicator": "CHIRPS_rainfall_baseline",
+        "year": 2026,
+        "month": 1,
+        "rainfall_mm": 112.0,
+        "LST_celsius": NaN
+      },
+      {
+        "zone": "Ihefu Core",
+        "indicator": "CHIRPS_rainfall_current",
+        "year": 2026,
+        "month": 1,
+        "rainfall_mm": 72.0,
+        "LST_celsius": NaN
+      },
+      {
+        "zone": "Ihefu Core",
+        "indicator": "CHIRPS_rainfall_baseline",
+        "year": 2026,
+        "month": 1,
+        "rainfall_mm": 115.0,
+        "LST_celsius": NaN
+      },
+      {
+        "zone": "Nyerere NP",
+        "indicator": "CHIRPS_rainfall_current",
+        "year": 2026,
+        "month": 1,
+        "rainfall_mm": 95.0,
+        "LST_celsius": NaN
+      },
+      {
+        "zone": "Nyerere NP",
+        "indicator": "CHIRPS_rainfall_baseline",
+        "year": 2026,
+        "month": 1,
+        "rainfall_mm": 103.0,
+        "LST_celsius": NaN
+      },
+      {
+        "zone": "Usangu GR",
+        "indicator": "LST_current",
+        "year": 2026,
+        "month": 1,
+        "rainfall_mm": NaN,
+        "LST_celsius": 31.2
+      },
+      {
+        "zone": "Usangu GR",
+        "indicator": "LST_baseline",
+        "year": 2026,
+        "month": 1,
+        "rainfall_mm": NaN,
+        "LST_celsius": 28.8
+      },
+      {
+        "zone": "Ihefu Core",
+        "indicator": "LST_current",
+        "year": 2026,
+        "month": 1,
+        "rainfall_mm": NaN,
+        "LST_celsius": 30.5
+      },
+      {
+        "zone": "Ihefu Core",
+        "indicator": "LST_baseline",
+        "year": 2026,
+        "month": 1,
+        "rainfall_mm": NaN,
+        "LST_celsius": 28.2
+      },
+      {
+        "zone": "Nyerere NP",
+        "indicator": "LST_current",
+        "year": 2026,
+        "month": 1,
+        "rainfall_mm": NaN,
+        "LST_celsius": 29.1
+      },
+      {
+        "zone": "Nyerere NP",
+        "indicator": "LST_baseline",
+        "year": 2026,
+        "month": 1,
+        "rainfall_mm": NaN,
+        "LST_celsius": 28.3
+      }
+    ]
+  }
+}

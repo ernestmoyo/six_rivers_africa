@@ -11,7 +11,7 @@ Author: Ernest Moyo / 7Square Inc.
 
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pandas as pd
@@ -95,7 +95,7 @@ def load_monthly_exports(year: int, month: int) -> dict:
 def validate_data_quality(datasets: dict) -> dict:
     """Run quality checks on ingested data and return quality report."""
     quality = {
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "checks": [],
         "overall_status": "PASS"
     }
@@ -179,10 +179,18 @@ def detect_alerts(datasets: dict, deviations: pd.DataFrame) -> list:
     alerts = []
 
     # NDVI/EVI deviation alerts
+    # Match indicators containing NDVI or EVI in the mean columns (skip stdDev)
     for _, row in deviations.iterrows():
-        if row["indicator"] in ("NDVI", "EVI") and row["deviation_pct"] is not None:
+        indicator = row["indicator"]
+        is_ndvi = "NDVI" in indicator and "stdDev" not in indicator
+        is_evi = "EVI" in indicator and "stdDev" not in indicator
+
+        if (is_ndvi or is_evi) and row["deviation_pct"] is not None:
             dev = row["deviation_pct"]
             zone = row["zone"]
+
+            # Derive a clean indicator label
+            indicator_label = "NDVI" if is_ndvi else "EVI"
 
             if dev <= thresholds["ndvi_evi_high"]["deviation_pct"]:
                 severity = "HIGH"
@@ -194,13 +202,13 @@ def detect_alerts(datasets: dict, deviations: pd.DataFrame) -> list:
             # Ihefu Core escalation rule
             if zone == "Ihefu Core" and severity == "MODERATE":
                 severity = "HIGH"
-                escalation = "Escalated: MODERATE in Ihefu Core → HIGH"
+                escalation = "Escalated: MODERATE in Ihefu Core -> HIGH"
             else:
                 escalation = None
 
             alerts.append({
                 "zone": zone,
-                "indicator": row["indicator"],
+                "indicator": indicator_label,
                 "severity": severity,
                 "deviation_pct": dev,
                 "current": row["current"],
@@ -282,7 +290,7 @@ def compile_monthly_dataset(year: int, month: int) -> dict:
     output = {
         "metadata": {
             "report_period": f"{year}-{month:02d}",
-            "generated_at": datetime.utcnow().isoformat(),
+            "generated_at": datetime.now(timezone.utc).isoformat(),
             "prepared_by": "Ernest Moyo / 7Square Inc.",
             "organisation": "Six Rivers Africa",
             "boundary_status": "PLACEHOLDER",

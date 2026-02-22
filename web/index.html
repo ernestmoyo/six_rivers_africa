@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Six Rivers Africa — Landscape Health Intelligence Dashboard</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>">
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Plotly -->
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #1B5E20;
+            --primary-light: #4CAF50;
+            --primary-bg: #E8F5E9;
+            --secondary: #0D47A1;
+            --secondary-light: #2196F3;
+            --accent: #FF6F00;
+            --danger: #D32F2F;
+            --warning: #FF9800;
+            --success: #4CAF50;
+            --neutral: #607D8B;
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --text: #212121;
+            --text-secondary: #757575;
+            --border: #e0e0e0;
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+            --zone1: #2E7D32;
+            --zone1-ihefu: #1565C0;
+            --zone2: #C62828;
+            --sidebar-w: 260px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: linear-gradient(180deg, #1a2332 0%, #0d1520 100%);
+            color: #fff;
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-header h1 {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #81C784;
+        }
+        .sidebar-header p {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 4px;
+        }
+
+        .nav-section {
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .nav-section-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.35);
+            padding: 0 20px;
+            margin-bottom: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
+            gap: 12px;
+            border-left: 3px solid transparent;
+        }
+        .nav-item:hover {
+            background: rgba(255,255,255,0.06);
+            color: #fff;
+        }
+        .nav-item.active {
+            background: rgba(129,199,132,0.12);
+            color: #81C784;
+            border-left-color: #81C784;
+        }
+        .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+
+        .sidebar-footer {
+            padding: 16px 20px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.3);
+            line-height: 1.6;
+        }
+        .sidebar-footer a { color: #81C784; text-decoration: none; }
+
+        .boundary-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+            background: rgba(255,152,0,0.2);
+            color: #FFB74D;
+            margin-top: 8px;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main {
+            margin-left: var(--sidebar-w);
+            flex: 1;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: var(--card);
+            padding: 14px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .topbar-title { font-size: 15px; font-weight: 600; color: var(--primary); }
+        .topbar-meta { font-size: 12px; color: var(--text-secondary); display: flex; gap: 16px; }
+        .topbar-meta span { display: flex; align-items: center; gap: 4px; }
+
+        .content { padding: 24px 30px; }
+
+        /* ===== PAGES ===== */
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-title .dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* ===== KPI ROW ===== */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .kpi {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            border-top: 3px solid var(--primary);
+            transition: transform 0.2s;
+        }
+        .kpi:hover { transform: translateY(-2px); }
+        .kpi.danger { border-top-color: var(--danger); }
+        .kpi.warning { border-top-color: var(--warning); }
+        .kpi.info { border-top-color: var(--secondary); }
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1.2;
+        }
+        .kpi.danger .kpi-value { color: var(--danger); }
+        .kpi.warning .kpi-value { color: var(--warning); }
+        .kpi.info .kpi-value { color: var(--secondary); }
+        .kpi-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        /* ===== GRID LAYOUTS ===== */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+        /* ===== MAP ===== */
+        #overview-map { height: 520px; border-radius: 8px; z-index: 1; }
+
+        /* ===== DISCLAIMER ===== */
+        .disclaimer {
+            background: #FFF8E1;
+            border-left: 4px solid var(--warning);
+            padding: 12px 16px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #5D4037;
+            margin-bottom: 20px;
+        }
+
+        /* ===== TABLES ===== */
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th {
+            background: var(--primary);
+            color: #fff;
+            padding: 10px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: left;
+        }
+        .data-table td {
+            padding: 10px 14px;
+            font-size: 13px;
+            border-bottom: 1px solid var(--border);
+        }
+        .data-table tr:hover { background: #f8f9fa; }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #fff;
+        }
+        .badge-high { background: var(--danger); }
+        .badge-moderate { background: var(--warning); }
+        .badge-normal { background: var(--success); }
+        .badge-placeholder { background: var(--accent); font-size: 10px; }
+
+        /* ===== ZONE TAGS ===== */
+        .zone-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #fff;
+        }
+        .zone-tag.z1 { background: var(--zone1); }
+        .zone-tag.z1i { background: var(--zone1-ihefu); }
+        .zone-tag.z2 { background: var(--zone2); }
+
+        /* ===== RECOMMENDATION CARDS ===== */
+        .rec-card {
+            background: #FFF8E1;
+            border-left: 4px solid var(--danger);
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        .rec-card h4 { color: var(--danger); font-size: 14px; margin-bottom: 8px; }
+        .rec-card p { font-size: 13px; margin-bottom: 4px; }
+
+        /* ===== ZONE INFO CARDS ===== */
+        .zone-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .zone-card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--zone1);
+        }
+        .zone-card.z2 { border-left-color: var(--zone2); }
+        .zone-card.ihefu { border-left-color: var(--zone1-ihefu); }
+        .zone-card h3 { font-size: 15px; margin-bottom: 8px; }
+        .zone-card .meta { font-size: 12px; color: var(--text-secondary); line-height: 1.8; }
+
+        /* ===== MOBILE ===== */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 12px; left: 12px;
+            z-index: 1100;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main { margin-left: 0; }
+            .menu-toggle { display: block; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .topbar { padding-left: 50px; }
+        }
+
+        /* ===== CHART CONTAINERS ===== */
+        .chart-box { min-height: 350px; }
+        .chart-box-sm { min-height: 280px; }
+    </style>
+</head>
+<body>
+
+    <button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">&#9776;</button>
+
+    <!-- ===== SIDEBAR ===== -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h1>SIX RIVERS AFRICA</h1>
+            <p>Landscape Health Intelligence Dashboard</p>
+            <p>Research & Restoration Programme</p>
+            <span class="boundary-badge">PLACEHOLDER BOUNDARIES</span>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-label">Dashboard</div>
+            <div class="nav-item active" onclick="showPage('overview')">
+                <span class="icon">&#127758;</span> Overview
+            </div>
+            <div class="nav-item" onclick="showPage('map')">
+                <span class="icon">&#128506;</span> Interactive Map
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-label">Indicators</div>
+            <div class="nav-item" onclick="showPage('vegetation')">
+                <span class="icon">&#127793;</span> Vegetation Health
+            </div>
+            <div class="nav-item" onclick="showPage('water')">
+                <span class="icon">&#128167;</span> Water & Wetlands
+            </div>
+            <div class="nav-item" onclick="showPage('fire')">
+                <span class="icon">&#128293;</span> Fire Monitoring
+            </div>
+            <div class="nav-item" onclick="showPage('climate')">
+                <span class="icon">&#127782;</span> Climate Context
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-label">Operations</div>
+            <div class="nav-item" onclick="showPage('alerts')">
+                <span class="icon">&#9888;</span> Alert Dashboard
+            </div>
+            <div class="nav-item" onclick="showPage('zones')">
+                <span class="icon">&#128204;</span> Zone Profiles
+            </div>
+            <div class="nav-item" onclick="showPage('methodology')">
+                <span class="icon">&#128218;</span> Methodology
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <strong>Prepared by</strong><br>
+            Ernest Moyo / 7Square Inc.<br>
+            <a href="https://7squareinc.com" target="_blank">7squareinc.com</a> |
+            <a href="https://github.com/ernestmoyo/six_rivers_africa" target="_blank">GitHub</a><br><br>
+            CRS: EPSG:4326 | UTM 36S<br>
+            Baseline: 2018-2023
+        </div>
+    </nav>
+
+    <!-- ===== MAIN ===== -->
+    <div class="main">
+        <div class="topbar">
+            <div class="topbar-title" id="page-title">Overview</div>
+            <div class="topbar-meta">
+                <span>Period: <strong>January 2026</strong></span>
+                <span>Generated: <strong id="gen-date"></strong></span>
+                <span>Status: <strong>DRAFT</strong></span>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="disclaimer">
+                <strong>Spatial Disclaimer:</strong> Zone boundaries are indicative placeholders based on published descriptions (WDPA, conservation literature). Spatial attribution is approximate until authoritative shapefiles are received from Six Rivers Africa.
+            </div>
+
+            <!-- ===== OVERVIEW PAGE ===== -->
+            <div class="page active" id="page-overview">
+                <div class="kpi-grid" id="kpi-grid"></div>
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-title"><span class="dot" style="background:var(--primary)"></span> Executive Summary</div>
+                        <div id="exec-summary" style="font-size:14px;line-height:1.7;"></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title"><span class="dot" style="background:var(--danger)"></span> Active Alerts</div>
+                        <div id="overview-alerts"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><span class="dot" style="background:var(--secondary)"></span> Multi-Indicator Deviation Heatmap</div>
+                    <div id="heatmap-chart" class="chart-box"></div>
+                </div>
+            </div>
+
+            <!-- ===== MAP PAGE ===== -->
+            <div class="page" id="page-map">
+                <div class="card" style="padding:0;overflow:hidden;border-radius:12px;">
+                    <div id="overview-map"></div>
+                </div>
+                <div class="zone-info" style="margin-top:20px;">
+                    <div class="zone-card">
+                        <h3><span class="zone-tag z1">Zone 1</span> Usangu Game Reserve</h3>
+                        <div class="meta">
+                            Authority: TAWA | Area: ~2,500 km&sup2;<br>
+                            Key rivers: Great Ruaha, Chimala<br>
+                            Species: Elephant, Buffalo, Wild Dog, Lion, Hippo, Tigerfish<br>
+                            Base: Ikoga Airstrip (SRA operational hub)
+                        </div>
+                    </div>
+                    <div class="zone-card ihefu">
+                        <h3><span class="zone-tag z1i">Core</span> Ihefu Swamp</h3>
+                        <div class="meta">
+                            Highest sensitivity sub-zone (~350 km&sup2;)<br>
+                            MODERATE alerts auto-escalate to HIGH<br>
+                            Critical water source for Great Ruaha River<br>
+                            Ecosystem: seasonal floodplain wetland
+                        </div>
+                    </div>
+                    <div class="zone-card z2">
+                        <h3><span class="zone-tag z2">Zone 2</span> Nyerere National Park</h3>
+                        <div class="meta">
+                            Authority: TANAPA | Area: ~30,893 km&sup2;<br>
+                            UNESCO World Heritage Site (1982) | IUCN Cat. II<br>
+                            Key rivers: Rufiji, Great Ruaha, Kilombero<br>
+                            Species: Elephant, Lion, Wild Dog, Crocodile, Sable Antelope
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== VEGETATION PAGE ===== -->
+            <div class="page" id="page-vegetation">
+                <div class="grid-2">
+                    <div class="card"><div class="card-title"><span class="dot" style="background:var(--zone1)"></span> NDVI — Current vs Baseline</div><div id="ndvi-chart" class="chart-box"></div></div>
+                    <div class="card"><div class="card-title"><span class="dot" style="background:var(--zone2)"></span> EVI — Current vs Baseline</div><div id="evi-chart" class="chart-box"></div></div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><span class="dot" style="background:var(--warning)"></span> NDVI Deviation Gauges</div>
+                    <div id="gauge-chart" class="chart-box-sm"></div>
+                </div>
+            </div>
+
+            <!-- ===== WATER PAGE ===== -->
+            <div class="page" id="page-water">
+                <div class="card">
+                    <div class="card-title"><span class="dot" style="background:var(--zone1-ihefu)"></span> Ihefu Swamp — Surface Water & NDWI</div>
+                    <div id="water-chart" class="chart-box"></div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><span class="dot" style="background:var(--secondary)"></span> Great Ruaha River Connectivity</div>
+                    <p style="font-size:13px;color:var(--text-secondary);padding:40px;text-align:center;">
+                        River connectivity analysis requires multi-month time series data.<br>
+                        Available after 3+ reporting cycles with GEE pipeline operational.
+                    </p>
+                </div>
+            </div>
+
+            <!-- ===== FIRE PAGE ===== -->
+            <div class="page" id="page-fire">
+                <div class="kpi-grid" id="fire-kpi-grid"></div>
+                <div class="card">
+                    <div class="card-title"><span class="dot" style="background:var(--danger)"></span> Fire Detections & Burn Scar</div>
+                    <div id="fire-chart" class="chart-box"></div>
+                </div>
+            </div>
+
+            <!-- ===== CLIMATE PAGE ===== -->
+            <div class="page" id="page-climate">
+                <div class="grid-2">
+                    <div class="card"><div class="card-title"><span class="dot" style="background:var(--secondary)"></span> Rainfall — CHIRPS v2.0</div><div id="rainfall-chart" class="chart-box"></div></div>
+                    <div class="card"><div class="card-title"><span class="dot" style="background:var(--danger)"></span> Land Surface Temperature</div><div id="lst-chart" class="chart-box"></div></div>
+                </div>
+            </div>
+
+            <!-- ===== ALERTS PAGE ===== -->
+            <div class="page" id="page-alerts">
+                <div class="card">
+                    <div class="card-title"><span class="dot" style="background:var(--danger)"></span> Alert Summary</div>
+                    <div id="alert-bar-chart" class="chart-box-sm"></div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><span class="dot" style="background:var(--danger)"></span> Alert Detail Table</div>
+                    <table class="data-table" id="alert-table">
+                        <thead><tr><th>Zone</th><th>Indicator</th><th>Severity</th><th>Detail</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div id="recommendations-section"></div>
+            </div>
+
+            <!-- ===== ZONES PAGE ===== -->
+            <div class="page" id="page-zones">
+                <div id="zone-detail-cards"></div>
+                <div class="card">
+                    <div class="card-title"><span class="dot" style="background:var(--neutral)"></span> Shapefile Register</div>
+                    <table class="data-table">
+                        <thead><tr><th>Shapefile</th><th>Type</th><th>Source</th><th>Status</th><th>CRS</th></tr></thead>
+                        <tbody>
+                            <tr><td>usangu_game_reserve.shp</td><td>Polygon</td><td>WDPA 20021 / TAWA</td><td><span class="badge badge-moderate">PLACEHOLDER</span></td><td>EPSG:4326</td></tr>
+                            <tr><td>ihefu_swamp_core.shp</td><td>Polygon</td><td>Wetlands Intl / Ramsar</td><td><span class="badge badge-moderate">PLACEHOLDER</span></td><td>EPSG:4326</td></tr>
+                            <tr><td>nyerere_np_boundary.shp</td><td>Polygon</td><td>Protected Planet WDPA 1695</td><td><span class="badge badge-moderate">PLACEHOLDER</span></td><td>EPSG:4326</td></tr>
+                            <tr><td>great_ruaha_river.shp</td><td>LineString</td><td>HydroSHEDS / GRDC</td><td><span class="badge badge-moderate">PLACEHOLDER</span></td><td>EPSG:4326</td></tr>
+                            <tr><td>rufiji_river.shp</td><td>LineString</td><td>HydroSHEDS / GRDC</td><td><span class="badge badge-moderate">PLACEHOLDER</span></td><td>EPSG:4326</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ===== METHODOLOGY PAGE ===== -->
+            <div class="page" id="page-methodology">
+                <div class="card">
+                    <div class="card-title"><span class="dot" style="background:var(--primary)"></span> Environmental Indicators & Data Sources</div>
+                    <table class="data-table">
+                        <thead><tr><th>Indicator</th><th>Source</th><th>Resolution</th><th>Baseline</th><th>Scientific Rationale</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>NDVI</strong></td><td>Sentinel-2 SR</td><td>10 m</td><td>2018-2023</td><td>Vegetation productivity; grazing pressure; habitat quality</td></tr>
+                            <tr><td><strong>EVI</strong></td><td>MODIS MOD13Q1</td><td>250 m</td><td>2018-2023</td><td>Reduced canopy saturation; superior in dense miombo woodland</td></tr>
+                            <tr><td><strong>NDWI</strong></td><td>Sentinel-2 SR</td><td>10 m</td><td>2018-2023</td><td>Open water quantification; Ihefu wetland health</td></tr>
+                            <tr><td><strong>Surface Water</strong></td><td>JRC GSW</td><td>30 m</td><td>Seasonal norm</td><td>Inundation tracking; Ihefu swamp extent</td></tr>
+                            <tr><td><strong>Active Fire</strong></td><td>NASA FIRMS</td><td>1 km</td><td>Any = HIGH</td><td>Fire ecology; illegal burning detection</td></tr>
+                            <tr><td><strong>Burn Scar</strong></td><td>MODIS MCD64A1</td><td>500 m</td><td>30-day window</td><td>Monthly burned area product</td></tr>
+                            <tr><td><strong>Rainfall</strong></td><td>CHIRPS v2.0</td><td>~5.5 km</td><td>1981-2023 (30yr)</td><td>Drought/flood context for vegetation signals</td></tr>
+                            <tr><td><strong>LST</strong></td><td>MODIS MOD11A2</td><td>1 km</td><td>2018-2023</td><td>Thermal stress on vegetation and wildlife</td></tr>
+                            <tr><td><strong>Land Cover</strong></td><td>ESA WorldCover / Hansen GFC</td><td>10-30 m</td><td>Annual</td><td>Deforestation, agricultural expansion, wetland shrinkage</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card">
+                    <div class="card-title"><span class="dot" style="background:var(--warning)"></span> Alert Threshold Framework</div>
+                    <table class="data-table">
+                        <thead><tr><th>Indicator</th><th>Condition</th><th>Severity</th></tr></thead>
+                        <tbody>
+                            <tr><td>NDVI / EVI</td><td>&gt;15% below monthly baseline, &gt;2 km&sup2; extent</td><td><span class="badge badge-moderate">MODERATE</span></td></tr>
+                            <tr><td>NDVI / EVI</td><td>&gt;25% below monthly baseline, &gt;5 km&sup2; extent</td><td><span class="badge badge-high">HIGH</span></td></tr>
+                            <tr><td>Active Fire (FIRMS)</td><td>Any detection within zone boundary</td><td><span class="badge badge-high">HIGH</span></td></tr>
+                            <tr><td>Forest/Woodland Loss</td><td>&gt;0.5 km&sup2; in 30-day window</td><td><span class="badge badge-moderate">MODERATE</span></td></tr>
+                            <tr><td>Forest/Woodland Loss</td><td>&gt;2.0 km&sup2; in 30-day window</td><td><span class="badge badge-high">HIGH</span></td></tr>
+                            <tr><td>Surface Water (Ihefu)</td><td>&gt;25% deviation from seasonal norm</td><td><span class="badge badge-moderate">MODERATE</span></td></tr>
+                            <tr><td>Rainfall (CHIRPS)</td><td>&gt;40% deficit vs 30-yr mean, 3+ decades</td><td><span class="badge badge-high">HIGH</span></td></tr>
+                            <tr><td>Land Surface Temp</td><td>&gt;3&deg;C above monthly baseline</td><td><span class="badge badge-moderate">MODERATE</span></td></tr>
+                        </tbody>
+                    </table>
+                    <div class="disclaimer" style="margin-top:16px;">
+                        <strong>Ihefu Escalation Rule:</strong> Any MODERATE alert within the Ihefu Swamp Core automatically escalates to HIGH. This inner wetland is ecologically irreplaceable.
+                    </div>
+                    <div class="disclaimer">
+                        <strong>UNESCO Protocol:</strong> Any HIGH alert within Nyerere NP must reference Tanzania's UNESCO World Heritage obligations in government and donor communications.
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><span class="dot" style="background:var(--neutral)"></span> Spatial Framework</div>
+                    <table class="data-table">
+                        <thead><tr><th>Parameter</th><th>Value</th></tr></thead>
+                        <tbody>
+                            <tr><td>Storage CRS</td><td>EPSG:4326 (WGS 84 Geographic)</td></tr>
+                            <tr><td>Analysis CRS</td><td>EPSG:32736 (WGS 84 / UTM Zone 36S)</td></tr>
+                            <tr><td>Display CRS</td><td>EPSG:3857 (Web Mercator)</td></tr>
+                            <tr><td>Primary format</td><td>GeoPackage (.gpkg) + Shapefile (.shp)</td></tr>
+                            <tr><td>Processing</td><td>Google Earth Engine (zonal statistics)</td></tr>
+                            <tr><td>Baseline period</td><td>2018-2023 (5-year monthly means)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+    </div><!-- /main -->
+
+    <script src="app.js"></script>
+</body>
+</html>
