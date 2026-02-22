@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "six-rivers-africa-dashboard",
   "builds": [
     {
       "src": "web/**",

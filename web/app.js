@@ -205,6 +205,13 @@ function getDevs(indicatorMatch) {
 
 function safeVal(v) { return (v == null || (typeof v === 'number' && isNaN(v))) ? null : v; }
 
+function hexToRgba(hex, alpha = 0.5) {
+    const r = parseInt(hex.slice(1,3), 16);
+    const g = parseInt(hex.slice(3,5), 16);
+    const b = parseInt(hex.slice(5,7), 16);
+    return `rgba(${r},${g},${b},${alpha})`;
+}
+
 // ============================================================================
 // NDVI CHART
 // ============================================================================
@@ -217,7 +224,7 @@ function renderNDVIChart() {
 
     Plotly.newPlot('ndvi-chart', [
         { x: zones, y: current, name: 'Current', type: 'bar', marker: { color: zones.map(z => ZONE_COLORS[z] || COLORS.neutral) }, text: current.map(v => v?.toFixed(2) || 'N/A'), textposition: 'outside' },
-        { x: zones, y: baseline, name: 'Baseline (2018-2023)', type: 'bar', marker: { color: zones.map(z => (ZONE_COLORS[z] || COLORS.neutral) + '88'), opacity: 0.6 }, text: baseline.map(v => v?.toFixed(2) || 'N/A'), textposition: 'outside' }
+        { x: zones, y: baseline, name: 'Baseline (2018-2023)', type: 'bar', marker: { color: zones.map(z => hexToRgba(ZONE_COLORS[z] || COLORS.neutral, 0.5)) }, text: baseline.map(v => v?.toFixed(2) || 'N/A'), textposition: 'outside' }
     ], {
         barmode: 'group', template: 'plotly_white', height: 350, margin: { t: 30, b: 40 },
         yaxis: { title: 'NDVI Mean', range: [0, Math.max(...current.filter(Boolean), ...baseline.filter(Boolean)) * 1.25 || 1] },
@@ -237,7 +244,7 @@ function renderEVIChart() {
 
     Plotly.newPlot('evi-chart', [
         { x: zones, y: current, name: 'Current', type: 'bar', marker: { color: zones.map(z => ZONE_COLORS[z] || COLORS.neutral) }, text: current.map(v => v?.toFixed(2) || 'N/A'), textposition: 'outside' },
-        { x: zones, y: baseline, name: 'Baseline (2018-2023)', type: 'bar', marker: { color: zones.map(z => (ZONE_COLORS[z] || COLORS.neutral) + '88'), opacity: 0.6 }, text: baseline.map(v => v?.toFixed(2) || 'N/A'), textposition: 'outside' }
+        { x: zones, y: baseline, name: 'Baseline (2018-2023)', type: 'bar', marker: { color: zones.map(z => hexToRgba(ZONE_COLORS[z] || COLORS.neutral, 0.5)) }, text: baseline.map(v => v?.toFixed(2) || 'N/A'), textposition: 'outside' }
     ], {
         barmode: 'group', template: 'plotly_white', height: 350, margin: { t: 30, b: 40 },
         yaxis: { title: 'EVI Mean', range: [0, Math.max(...current.filter(Boolean), ...baseline.filter(Boolean)) * 1.25 || 1] },
@@ -396,7 +403,7 @@ function renderRainfallChart() {
 
     Plotly.newPlot('rainfall-chart', [
         { x: zones, y: current, name: 'Current (mm)', type: 'bar', marker: { color: zones.map(z => ZONE_COLORS[z] || COLORS.secondary) } },
-        { x: zones, y: baseline, name: '30yr Mean (mm)', type: 'bar', marker: { color: zones.map(z => (ZONE_COLORS[z] || COLORS.secondary) + '88'), opacity: 0.6 } }
+        { x: zones, y: baseline, name: '30yr Mean (mm)', type: 'bar', marker: { color: zones.map(z => hexToRgba(ZONE_COLORS[z] || COLORS.secondary, 0.5)) } }
     ], {
         barmode: 'group', template: 'plotly_white', height: 350, margin: { t: 30 },
         yaxis: { title: 'Rainfall (mm)' },
@@ -416,7 +423,7 @@ function renderLSTChart() {
 
     Plotly.newPlot('lst-chart', [
         { x: zones, y: current, name: 'Current (°C)', type: 'bar', marker: { color: zones.map(z => ZONE_COLORS[z] || COLORS.danger) } },
-        { x: zones, y: baseline, name: 'Baseline (°C)', type: 'bar', marker: { color: zones.map(z => (ZONE_COLORS[z] || COLORS.danger) + '88'), opacity: 0.6 } }
+        { x: zones, y: baseline, name: 'Baseline (°C)', type: 'bar', marker: { color: zones.map(z => hexToRgba(ZONE_COLORS[z] || COLORS.danger, 0.5)) } }
     ], {
         barmode: 'group', template: 'plotly_white', height: 350, margin: { t: 30 },
         yaxis: { title: 'Temperature (°C)' },
@@ -538,7 +545,7 @@ function renderZoneDetails() {
 function initMap() {
     if (leafletMap) return;
 
-    leafletMap = L.map('overview-map', { zoomControl: true }).setView([-8.8, 36.5], 6);
+    leafletMap = L.map('overview-map', { zoomControl: true }).setView([-6.5, 35.0], 6);
 
     // Tile layers
     const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
@@ -553,17 +560,48 @@ function initMap() {
 
     satellite.addTo(leafletMap);
 
+    // --- Tanzania country boundary (geoBoundaries ADM0) ---
+    const tzCountryGroup = L.layerGroup().addTo(leafletMap);
+    fetch('https://raw.githubusercontent.com/wmgeolab/geoBoundaries/main/releaseData/gbOpen/TZA/ADM0/geoBoundaries-TZA-ADM0_simplified.geojson')
+        .then(r => r.json())
+        .then(data => {
+            L.geoJSON(data, {
+                style: { color: '#FFD700', weight: 2.5, fillOpacity: 0, dashArray: '6,3' },
+                onEachFeature: (feature, layer) => {
+                    layer.bindPopup('<strong>United Republic of Tanzania</strong><br>Area: ~945,087 km²');
+                }
+            }).addTo(tzCountryGroup);
+        })
+        .catch(() => console.log('Tanzania country boundary unavailable'));
+
+    // --- Tanzania admin regions (geoBoundaries ADM1) ---
+    const tzRegionsGroup = L.layerGroup().addTo(leafletMap);
+    fetch('https://raw.githubusercontent.com/wmgeolab/geoBoundaries/main/releaseData/gbOpen/TZA/ADM1/geoBoundaries-TZA-ADM1_simplified.geojson')
+        .then(r => r.json())
+        .then(data => {
+            L.geoJSON(data, {
+                style: { color: '#FFD700', weight: 1, fillOpacity: 0.02, opacity: 0.5 },
+                onEachFeature: (feature, layer) => {
+                    const name = feature.properties.shapeName || feature.properties.NAME_1 || 'Region';
+                    layer.bindPopup(`<strong>${name} Region</strong>`);
+                    layer.on('mouseover', function() { this.setStyle({ fillOpacity: 0.08, weight: 2 }); });
+                    layer.on('mouseout', function() { this.setStyle({ fillOpacity: 0.02, weight: 1 }); });
+                }
+            }).addTo(tzRegionsGroup);
+        })
+        .catch(() => console.log('Tanzania region boundaries unavailable'));
+
     // Zone polygons
     const usanguPoly = L.polygon(ZONES.usangu.coords, {
-        color: ZONES.usangu.color, weight: 2, fillOpacity: 0.15
+        color: ZONES.usangu.color, weight: 2.5, fillOpacity: 0.15
     }).bindPopup(`<strong>${ZONES.usangu.name}</strong><br>Authority: ${ZONES.usangu.authority}<br>Area: ${ZONES.usangu.area}<br><em>PLACEHOLDER boundary</em>`);
 
     const ihefuPoly = L.polygon(ZONES.ihefu.coords, {
-        color: ZONES.ihefu.color, weight: 2, fillOpacity: 0.25
-    }).bindPopup(`<strong>${ZONES.ihefu.name}</strong><br>Authority: ${ZONES.ihefu.authority}<br>Area: ${ZONES.ihefu.area}<br><em>MODERATE alerts → HIGH</em>`);
+        color: ZONES.ihefu.color, weight: 2.5, fillOpacity: 0.25
+    }).bindPopup(`<strong>${ZONES.ihefu.name}</strong><br>Authority: ${ZONES.ihefu.authority}<br>Area: ${ZONES.ihefu.area}<br><em>MODERATE alerts auto-escalate to HIGH</em>`);
 
     const nyererePoly = L.polygon(ZONES.nyerere.coords, {
-        color: ZONES.nyerere.color, weight: 2, fillOpacity: 0.10
+        color: ZONES.nyerere.color, weight: 2.5, fillOpacity: 0.10
     }).bindPopup(`<strong>${ZONES.nyerere.name}</strong><br>Authority: ${ZONES.nyerere.authority}<br>Area: ${ZONES.nyerere.area}<br>UNESCO World Heritage Site (1982)<br><em>PLACEHOLDER boundary</em>`);
 
     // Rivers
@@ -575,15 +613,40 @@ function initMap() {
     // Markers
     const ikoga = L.marker([-8.85, 34.30]).bindPopup('<strong>Ikoga Airstrip</strong><br>Six Rivers Africa Operational Base<br><em>Location approximate</em>');
 
+    // Fire markers from data
+    const fireMarkers = [];
+    const fireData = dashboardData?.raw_datasets?.fire || [];
+    const activeFires = fireData.filter(r => r.indicator === 'active_fire_count' && r.T21_count > 0);
+    activeFires.forEach(f => {
+        const zoneKey = Object.keys(ZONES).find(k => ZONES[k].name.includes(f.zone.split(' ')[0]));
+        if (zoneKey) {
+            const center = ZONES[zoneKey].coords[Math.floor(ZONES[zoneKey].coords.length / 2)];
+            const fireIcon = L.divIcon({
+                html: '<div style="background:#D32F2F;color:white;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;box-shadow:0 2px 6px rgba(0,0,0,0.3);">&#128293;</div>',
+                iconSize: [24, 24], className: ''
+            });
+            fireMarkers.push(
+                L.marker(center, { icon: fireIcon })
+                    .bindPopup(`<strong>Active Fire — ${f.zone}</strong><br>Detections: ${f.T21_count}<br><span style="color:#D32F2F;">HIGH ALERT</span>`)
+            );
+        }
+    });
+
     // Layer groups
     const zonesGroup = L.layerGroup([usanguPoly, ihefuPoly, nyererePoly]).addTo(leafletMap);
     const riversGroup = L.layerGroup([ruahaLine, rufijiLine]).addTo(leafletMap);
-    const markersGroup = L.layerGroup([ikoga]).addTo(leafletMap);
+    const markersGroup = L.layerGroup([ikoga, ...fireMarkers]).addTo(leafletMap);
 
     // Controls
     L.control.layers(
         { 'Satellite': satellite, 'Street Map': osm, 'Topographic': topo },
-        { 'Zone Boundaries': zonesGroup, 'Rivers': riversGroup, 'Markers': markersGroup },
+        {
+            'Tanzania Boundary': tzCountryGroup,
+            'Admin Regions': tzRegionsGroup,
+            'SRA Zone Boundaries': zonesGroup,
+            'Rivers': riversGroup,
+            'Markers & Fires': markersGroup
+        },
         { collapsed: false }
     ).addTo(leafletMap);
 
@@ -596,10 +659,12 @@ function initMap() {
         div.style.cssText = 'background:white;padding:10px 14px;border-radius:8px;font-size:11px;line-height:1.8;box-shadow:0 2px 8px rgba(0,0,0,0.15);';
         div.innerHTML = `
             <strong>Six Rivers Africa</strong><br>
+            <span style="display:inline-block;width:12px;height:3px;background:#FFD700;margin:4px 0;border-top:1px dashed #FFD700;"></span> Tanzania<br>
             <span style="display:inline-block;width:12px;height:12px;background:${COLORS.zone1};border-radius:2px;"></span> Usangu GR<br>
             <span style="display:inline-block;width:12px;height:12px;background:${COLORS.zone1_ihefu};border-radius:2px;"></span> Ihefu Core<br>
             <span style="display:inline-block;width:12px;height:12px;background:${COLORS.zone2};border-radius:2px;"></span> Nyerere NP<br>
             <span style="display:inline-block;width:12px;height:3px;background:#1565C0;margin:4px 0;"></span> Rivers<br>
+            <span style="color:${COLORS.danger};">&#128293;</span> Active Fire<br>
             <span style="color:${COLORS.warning};font-weight:600;">PLACEHOLDER</span>
         `;
         return div;

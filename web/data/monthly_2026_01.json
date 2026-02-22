@@ -103,16 +103,16 @@
     {
       "zone": "Ihefu Core",
       "indicator": "EVI_mean",
-      "current": NaN,
-      "baseline": NaN,
-      "deviation_pct": NaN
+      "current": null,
+      "baseline": null,
+      "deviation_pct": null
     },
     {
       "zone": "Ihefu Core",
       "indicator": "EVI_stdDev",
-      "current": NaN,
-      "baseline": NaN,
-      "deviation_pct": NaN
+      "current": null,
+      "baseline": null,
+      "deviation_pct": null
     },
     {
       "zone": "Nyerere NP",
@@ -230,8 +230,8 @@
         "month": 1,
         "NDVI_mean": 0.42,
         "NDVI_stdDev": 0.08,
-        "EVI_mean": NaN,
-        "EVI_stdDev": NaN
+        "EVI_mean": null,
+        "EVI_stdDev": null
       },
       {
         "zone": "Usangu GR",
@@ -240,8 +240,8 @@
         "month": 1,
         "NDVI_mean": 0.51,
         "NDVI_stdDev": 0.06,
-        "EVI_mean": NaN,
-        "EVI_stdDev": NaN
+        "EVI_mean": null,
+        "EVI_stdDev": null
       },
       {
         "zone": "Usangu GR",
@@ -250,16 +250,16 @@
         "month": 1,
         "NDVI_mean": -17.6,
         "NDVI_stdDev": 5.2,
-        "EVI_mean": NaN,
-        "EVI_stdDev": NaN
+        "EVI_mean": null,
+        "EVI_stdDev": null
       },
       {
         "zone": "Usangu GR",
         "indicator": "EVI_current",
         "year": 2026,
         "month": 1,
-        "NDVI_mean": NaN,
-        "NDVI_stdDev": NaN,
+        "NDVI_mean": null,
+        "NDVI_stdDev": null,
         "EVI_mean": 0.31,
         "EVI_stdDev": 0.05
       },
@@ -268,8 +268,8 @@
         "indicator": "EVI_baseline",
         "year": 2026,
         "month": 1,
-        "NDVI_mean": NaN,
-        "NDVI_stdDev": NaN,
+        "NDVI_mean": null,
+        "NDVI_stdDev": null,
         "EVI_mean": 0.38,
         "EVI_stdDev": 0.04
       },
@@ -280,8 +280,8 @@
         "month": 1,
         "NDVI_mean": 0.38,
         "NDVI_stdDev": 0.1,
-        "EVI_mean": NaN,
-        "EVI_stdDev": NaN
+        "EVI_mean": null,
+        "EVI_stdDev": null
       },
       {
         "zone": "Ihefu Core",
@@ -290,8 +290,8 @@
         "month": 1,
         "NDVI_mean": 0.52,
         "NDVI_stdDev": 0.07,
-        "EVI_mean": NaN,
-        "EVI_stdDev": NaN
+        "EVI_mean": null,
+        "EVI_stdDev": null
       },
       {
         "zone": "Ihefu Core",
@@ -300,8 +300,8 @@
         "month": 1,
         "NDVI_mean": -26.9,
         "NDVI_stdDev": 6.1,
-        "EVI_mean": NaN,
-        "EVI_stdDev": NaN
+        "EVI_mean": null,
+        "EVI_stdDev": null
       },
       {
         "zone": "Nyerere NP",
@@ -310,8 +310,8 @@
         "month": 1,
         "NDVI_mean": 0.55,
         "NDVI_stdDev": 0.07,
-        "EVI_mean": NaN,
-        "EVI_stdDev": NaN
+        "EVI_mean": null,
+        "EVI_stdDev": null
       },
       {
         "zone": "Nyerere NP",
@@ -320,8 +320,8 @@
         "month": 1,
         "NDVI_mean": 0.58,
         "NDVI_stdDev": 0.05,
-        "EVI_mean": NaN,
-        "EVI_stdDev": NaN
+        "EVI_mean": null,
+        "EVI_stdDev": null
       },
       {
         "zone": "Nyerere NP",
@@ -330,16 +330,16 @@
         "month": 1,
         "NDVI_mean": -5.2,
         "NDVI_stdDev": 3.1,
-        "EVI_mean": NaN,
-        "EVI_stdDev": NaN
+        "EVI_mean": null,
+        "EVI_stdDev": null
       },
       {
         "zone": "Nyerere NP",
         "indicator": "EVI_current",
         "year": 2026,
         "month": 1,
-        "NDVI_mean": NaN,
-        "NDVI_stdDev": NaN,
+        "NDVI_mean": null,
+        "NDVI_stdDev": null,
         "EVI_mean": 0.39,
         "EVI_stdDev": 0.04
       },
@@ -348,8 +348,8 @@
         "indicator": "EVI_baseline",
         "year": 2026,
         "month": 1,
-        "NDVI_mean": NaN,
-        "NDVI_stdDev": NaN,
+        "NDVI_mean": null,
+        "NDVI_stdDev": null,
         "EVI_mean": 0.41,
         "EVI_stdDev": 0.03
       }
@@ -361,7 +361,7 @@
         "year": 2026,
         "month": 1,
         "T21_count": 3.0,
-        "BurnDate_sum": NaN
+        "BurnDate_sum": null
       },
       {
         "zone": "Ihefu Core",
@@ -369,7 +369,7 @@
         "year": 2026,
         "month": 1,
         "T21_count": 0.0,
-        "BurnDate_sum": NaN
+        "BurnDate_sum": null
       },
       {
         "zone": "Nyerere NP",
@@ -377,14 +377,14 @@
         "year": 2026,
         "month": 1,
         "T21_count": 0.0,
-        "BurnDate_sum": NaN
+        "BurnDate_sum": null
       },
       {
         "zone": "Usangu GR",
         "indicator": "burn_scar_km2",
         "year": 2026,
         "month": 1,
-        "T21_count": NaN,
+        "T21_count": null,
         "BurnDate_sum": 12.4
       },
       {
@@ -392,7 +392,7 @@
         "indicator": "burn_scar_km2",
         "year": 2026,
         "month": 1,
-        "T21_count": NaN,
+        "T21_count": null,
         "BurnDate_sum": 0.0
       },
       {
@@ -400,7 +400,7 @@
         "indicator": "burn_scar_km2",
         "year": 2026,
         "month": 1,
-        "T21_count": NaN,
+        "T21_count": null,
         "BurnDate_sum": 0.0
       }
     ],
@@ -411,8 +411,8 @@
         "year": 2026,
         "month": 1,
         "water_sum": 298.0,
-        "NDWI_mean": NaN,
-        "NDWI_stdDev": NaN
+        "NDWI_mean": null,
+        "NDWI_stdDev": null
       },
       {
         "zone": "Usangu GR",
@@ -420,15 +420,15 @@
         "year": 2026,
         "month": 1,
         "water_sum": 420.0,
-        "NDWI_mean": NaN,
-        "NDWI_stdDev": NaN
+        "NDWI_mean": null,
+        "NDWI_stdDev": null
       },
       {
         "zone": "Ihefu Core",
         "indicator": "NDWI",
         "year": 2026,
         "month": 1,
-        "water_sum": NaN,
+        "water_sum": null,
         "NDWI_mean": 0.18,
         "NDWI_stdDev": 0.12
       },
@@ -437,7 +437,7 @@
         "indicator": "NDWI",
         "year": 2026,
         "month": 1,
-        "water_sum": NaN,
+        "water_sum": null,
         "NDWI_mean": 0.05,
         "NDWI_stdDev": 0.15
       },
@@ -446,7 +446,7 @@
         "indicator": "NDWI",
         "year": 2026,
         "month": 1,
-        "water_sum": NaN,
+        "water_sum": null,
         "NDWI_mean": -0.02,
         "NDWI_stdDev": 0.18
       }
@@ -458,7 +458,7 @@
         "year": 2026,
         "month": 1,
         "rainfall_mm": 68.0,
-        "LST_celsius": NaN
+        "LST_celsius": null
       },
       {
         "zone": "Usangu GR",
@@ -466,7 +466,7 @@
         "year": 2026,
         "month": 1,
         "rainfall_mm": 112.0,
-        "LST_celsius": NaN
+        "LST_celsius": null
       },
       {
         "zone": "Ihefu Core",
@@ -474,7 +474,7 @@
         "year": 2026,
         "month": 1,
         "rainfall_mm": 72.0,
-        "LST_celsius": NaN
+        "LST_celsius": null
       },
       {
         "zone": "Ihefu Core",
@@ -482,7 +482,7 @@
         "year": 2026,
         "month": 1,
         "rainfall_mm": 115.0,
-        "LST_celsius": NaN
+        "LST_celsius": null
       },
       {
         "zone": "Nyerere NP",
@@ -490,7 +490,7 @@
         "year": 2026,
         "month": 1,
         "rainfall_mm": 95.0,
-        "LST_celsius": NaN
+        "LST_celsius": null
       },
       {
         "zone": "Nyerere NP",
@@ -498,14 +498,14 @@
         "year": 2026,
         "month": 1,
         "rainfall_mm": 103.0,
-        "LST_celsius": NaN
+        "LST_celsius": null
       },
       {
         "zone": "Usangu GR",
         "indicator": "LST_current",
         "year": 2026,
         "month": 1,
-        "rainfall_mm": NaN,
+        "rainfall_mm": null,
         "LST_celsius": 31.2
       },
       {
@@ -513,7 +513,7 @@
         "indicator": "LST_baseline",
         "year": 2026,
         "month": 1,
-        "rainfall_mm": NaN,
+        "rainfall_mm": null,
         "LST_celsius": 28.8
       },
       {
@@ -521,7 +521,7 @@
         "indicator": "LST_current",
         "year": 2026,
         "month": 1,
-        "rainfall_mm": NaN,
+        "rainfall_mm": null,
         "LST_celsius": 30.5
       },
       {
@@ -529,7 +529,7 @@
         "indicator": "LST_baseline",
         "year": 2026,
         "month": 1,
-        "rainfall_mm": NaN,
+        "rainfall_mm": null,
         "LST_celsius": 28.2
       },
       {
@@ -537,7 +537,7 @@
         "indicator": "LST_current",
         "year": 2026,
         "month": 1,
-        "rainfall_mm": NaN,
+        "rainfall_mm": null,
         "LST_celsius": 29.1
       },
       {
@@ -545,7 +545,7 @@
         "indicator": "LST_baseline",
         "year": 2026,
         "month": 1,
-        "rainfall_mm": NaN,
+        "rainfall_mm": null,
         "LST_celsius": 28.3
       }
     ]

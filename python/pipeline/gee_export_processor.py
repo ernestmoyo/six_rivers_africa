@@ -287,6 +287,10 @@ def compile_monthly_dataset(year: int, month: int) -> dict:
 
     alerts = detect_alerts(datasets, deviations)
 
+    # Convert DataFrames to dicts, replacing NaN with None for valid JSON
+    def sanitise_records(df):
+        return json.loads(df.to_json(orient="records"))
+
     output = {
         "metadata": {
             "report_period": f"{year}-{month:02d}",
@@ -297,9 +301,9 @@ def compile_monthly_dataset(year: int, month: int) -> dict:
             "crs_analysis": "EPSG:32736"
         },
         "data_quality": quality,
-        "deviations": deviations.to_dict(orient="records") if not deviations.empty else [],
+        "deviations": sanitise_records(deviations) if not deviations.empty else [],
         "alerts": alerts,
-        "raw_datasets": {k: v.to_dict(orient="records") for k, v in datasets.items()}
+        "raw_datasets": {k: sanitise_records(v) for k, v in datasets.items()}
     }
 
     # Write output
