@@ -30,34 +30,37 @@ const ZONE_COLORS = {
     'Nyerere NP': COLORS.zone2,
 };
 
-// Indicative zone boundaries (PLACEHOLDER)
-const ZONES = {
+// Placeholder boundaries for areas NOT mapped in OpenStreetMap
+const ZONES_PLACEHOLDER = {
     usangu: {
         coords: [[-8.15,33.25],[-8.10,33.90],[-8.20,34.55],[-8.55,34.70],[-8.95,34.65],[-9.15,34.40],[-9.10,33.80],[-8.85,33.35],[-8.50,33.20]],
         color: COLORS.zone1,
         name: 'Zone 1: Usangu Game Reserve',
         area: '~2,500 km²',
-        authority: 'TAWA'
+        authority: 'TAWA',
+        placeholder: true
     },
     ihefu: {
         coords: [[-8.55,33.70],[-8.50,34.05],[-8.60,34.25],[-8.80,34.30],[-8.95,34.10],[-8.90,33.75],[-8.75,33.60]],
         color: COLORS.zone1_ihefu,
         name: 'Ihefu Swamp Core',
         area: '~350 km²',
-        authority: 'TAWA — Highest Sensitivity'
-    },
+        authority: 'TAWA — Highest Sensitivity',
+        placeholder: true
+    }
+};
+
+// Zone config for data lookups (fire markers etc.)
+const ZONES = {
+    usangu: { ...ZONES_PLACEHOLDER.usangu },
+    ihefu: { ...ZONES_PLACEHOLDER.ihefu },
     nyerere: {
-        coords: [[-7.40,35.80],[-7.30,37.20],[-7.60,38.50],[-8.10,39.20],[-9.00,39.40],[-10.20,39.10],[-10.70,38.00],[-10.50,36.50],[-9.80,35.60],[-8.60,35.50]],
+        coords: [[-8.5, 37.5]], // centroid fallback
         color: COLORS.zone2,
         name: 'Zone 2: Nyerere National Park (Selous)',
         area: '~30,893 km²',
         authority: 'TANAPA — UNESCO World Heritage Site'
     }
-};
-
-const RIVERS = {
-    ruaha: { coords: [[-8.40,33.50],[-8.55,33.80],[-8.65,34.10],[-8.80,34.40],[-8.90,34.70]], name: 'Great Ruaha River' },
-    rufiji: { coords: [[-7.80,35.90],[-7.90,36.80],[-7.95,37.50],[-8.00,38.20],[-7.80,38.80],[-7.70,39.30]], name: 'Rufiji River' }
 };
 
 let dashboardData = null;
@@ -545,13 +548,13 @@ function renderZoneDetails() {
 function initMap() {
     if (leafletMap) return;
 
-    leafletMap = L.map('overview-map', { zoomControl: true }).setView([-6.5, 35.0], 6);
+    leafletMap = L.map('overview-map', { zoomControl: true }).setView([-8.0, 36.0], 6);
 
     // Tile layers
     const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         attribution: 'Esri World Imagery'
     });
-    const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    const osmTile = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     });
     const topo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
@@ -567,7 +570,7 @@ function initMap() {
         .then(data => {
             L.geoJSON(data, {
                 style: { color: '#FFD700', weight: 2.5, fillOpacity: 0, dashArray: '6,3' },
-                onEachFeature: (feature, layer) => {
+                onEachFeature: (f, layer) => {
                     layer.bindPopup('<strong>United Republic of Tanzania</strong><br>Area: ~945,087 km&sup2;<br><em>Source: HDX COD-AB</em>');
                 }
             }).addTo(tzCountryGroup);
@@ -580,9 +583,8 @@ function initMap() {
         .then(r => r.json())
         .then(data => {
             L.geoJSON(data, {
-                style: (feature) => {
-                    // Highlight regions containing SRA operational zones
-                    const name = (feature.properties.name || '').toLowerCase();
+                style: (feat) => {
+                    const name = (feat.properties.name || '').toLowerCase();
                     const isSRA = ['iringa', 'mbeya', 'morogoro', 'lindi', 'ruvuma', 'pwani', 'njombe'].includes(name);
                     return {
                         color: isSRA ? '#FFA000' : '#FFD700',
@@ -591,13 +593,13 @@ function initMap() {
                         opacity: isSRA ? 0.7 : 0.4
                     };
                 },
-                onEachFeature: (feature, layer) => {
-                    const name = feature.properties.name || 'Region';
-                    const pcode = feature.properties.pcode || '';
+                onEachFeature: (feat, layer) => {
+                    const name = feat.properties.name || 'Region';
+                    const pcode = feat.properties.pcode || '';
                     layer.bindPopup(`<strong>${name} Region</strong><br>P-Code: ${pcode}`);
                     layer.on('mouseover', function() { this.setStyle({ fillOpacity: 0.12, weight: 2.5, opacity: 0.9 }); });
                     layer.on('mouseout', function() {
-                        const n = (feature.properties.name || '').toLowerCase();
+                        const n = (feat.properties.name || '').toLowerCase();
                         const sra = ['iringa', 'mbeya', 'morogoro', 'lindi', 'ruvuma', 'pwani', 'njombe'].includes(n);
                         this.setStyle({ fillOpacity: sra ? 0.05 : 0.01, weight: sra ? 1.5 : 0.8, opacity: sra ? 0.7 : 0.4 });
                     });
@@ -606,24 +608,67 @@ function initMap() {
         })
         .catch(() => console.log('Tanzania region boundaries unavailable'));
 
-    // Zone polygons
-    const usanguPoly = L.polygon(ZONES.usangu.coords, {
-        color: ZONES.usangu.color, weight: 2.5, fillOpacity: 0.15
-    }).bindPopup(`<strong>${ZONES.usangu.name}</strong><br>Authority: ${ZONES.usangu.authority}<br>Area: ${ZONES.usangu.area}<br><em>PLACEHOLDER boundary</em>`);
+    // --- OSM zone boundaries (Nyerere NP + Selous GR) ---
+    const osmZonesGroup = L.layerGroup().addTo(leafletMap);
+    fetch('data/osm_zones.geojson')
+        .then(r => r.json())
+        .then(data => {
+            L.geoJSON(data, {
+                style: (feat) => {
+                    const isNyerere = feat.properties.short === 'Nyerere NP';
+                    return {
+                        color: isNyerere ? COLORS.zone2 : '#E65100',
+                        weight: 2.5,
+                        fillOpacity: isNyerere ? 0.10 : 0.08,
+                        dashArray: null
+                    };
+                },
+                onEachFeature: (feat, layer) => {
+                    const p = feat.properties;
+                    let popup = `<strong>${p.name}</strong><br>Authority: ${p.authority}`;
+                    if (p.area_km2) popup += `<br>Area: ${p.area_km2} km&sup2;`;
+                    if (p.heritage) popup += `<br>${p.heritage}`;
+                    popup += `<br><em>Source: ${p.source} (${p.osm_id})</em>`;
+                    layer.bindPopup(popup);
+                }
+            }).addTo(osmZonesGroup);
+        })
+        .catch(() => console.log('OSM zone boundaries unavailable'));
 
-    const ihefuPoly = L.polygon(ZONES.ihefu.coords, {
-        color: ZONES.ihefu.color, weight: 2.5, fillOpacity: 0.25
-    }).bindPopup(`<strong>${ZONES.ihefu.name}</strong><br>Authority: ${ZONES.ihefu.authority}<br>Area: ${ZONES.ihefu.area}<br><em>MODERATE alerts auto-escalate to HIGH</em>`);
+    // --- Placeholder zone boundaries (Usangu GR + Ihefu — not in OSM) ---
+    const placeholderGroup = L.layerGroup().addTo(leafletMap);
+    const usanguPoly = L.polygon(ZONES_PLACEHOLDER.usangu.coords, {
+        color: COLORS.zone1, weight: 2, fillOpacity: 0.12, dashArray: '5,5'
+    }).bindPopup('<strong>Zone 1: Usangu Game Reserve</strong><br>Authority: TAWA<br>Area: ~2,500 km&sup2;<br><em>PLACEHOLDER — not yet mapped in OSM</em>');
 
-    const nyererePoly = L.polygon(ZONES.nyerere.coords, {
-        color: ZONES.nyerere.color, weight: 2.5, fillOpacity: 0.10
-    }).bindPopup(`<strong>${ZONES.nyerere.name}</strong><br>Authority: ${ZONES.nyerere.authority}<br>Area: ${ZONES.nyerere.area}<br>UNESCO World Heritage Site (1982)<br><em>PLACEHOLDER boundary</em>`);
+    const ihefuPoly = L.polygon(ZONES_PLACEHOLDER.ihefu.coords, {
+        color: COLORS.zone1_ihefu, weight: 2.5, fillOpacity: 0.20, dashArray: '5,5'
+    }).bindPopup('<strong>Ihefu Swamp Core</strong><br>Authority: TAWA — Highest Sensitivity<br>Area: ~350 km&sup2;<br><em>MODERATE alerts auto-escalate to HIGH</em><br><em>PLACEHOLDER — not yet mapped in OSM</em>');
 
-    // Rivers
-    const ruahaLine = L.polyline(RIVERS.ruaha.coords, { color: '#1565C0', weight: 3, dashArray: '8, 4' })
-        .bindPopup(`<strong>${RIVERS.ruaha.name}</strong><br><em>Approximate centreline</em>`);
-    const rufijiLine = L.polyline(RIVERS.rufiji.coords, { color: '#1565C0', weight: 3, dashArray: '8, 4' })
-        .bindPopup(`<strong>${RIVERS.rufiji.name}</strong><br><em>Approximate centreline</em>`);
+    placeholderGroup.addLayer(usanguPoly);
+    placeholderGroup.addLayer(ihefuPoly);
+
+    // --- OSM Rivers (Great Ruaha + Rufiji) ---
+    const riversGroup = L.layerGroup().addTo(leafletMap);
+    fetch('data/osm_rivers.geojson')
+        .then(r => r.json())
+        .then(data => {
+            L.geoJSON(data, {
+                style: (feat) => {
+                    const isRuaha = feat.properties.name.includes('Ruaha');
+                    return {
+                        color: '#1565C0',
+                        weight: isRuaha ? 3 : 2.5,
+                        opacity: 0.8
+                    };
+                },
+                onEachFeature: (feat, layer) => {
+                    const p = feat.properties;
+                    layer.bindPopup(`<strong>${p.name}</strong><br><em>Source: ${p.source} (${p.osm_id || 'ways'})</em>`);
+                }
+            }).addTo(riversGroup);
+        })
+        .catch(() => console.log('OSM rivers unavailable'));
 
     // Markers
     const ikoga = L.marker([-8.85, 34.30]).bindPopup('<strong>Ikoga Airstrip</strong><br>Six Rivers Africa Operational Base<br><em>Location approximate</em>');
@@ -647,19 +692,17 @@ function initMap() {
         }
     });
 
-    // Layer groups
-    const zonesGroup = L.layerGroup([usanguPoly, ihefuPoly, nyererePoly]).addTo(leafletMap);
-    const riversGroup = L.layerGroup([ruahaLine, rufijiLine]).addTo(leafletMap);
     const markersGroup = L.layerGroup([ikoga, ...fireMarkers]).addTo(leafletMap);
 
     // Controls
     L.control.layers(
-        { 'Satellite': satellite, 'Street Map': osm, 'Topographic': topo },
+        { 'Satellite': satellite, 'Street Map': osmTile, 'Topographic': topo },
         {
             'Tanzania Boundary': tzCountryGroup,
             'Admin Regions': tzRegionsGroup,
-            'SRA Zone Boundaries': zonesGroup,
-            'Rivers': riversGroup,
+            'Nyerere NP / Selous (OSM)': osmZonesGroup,
+            'Usangu GR / Ihefu (placeholder)': placeholderGroup,
+            'Rivers (OSM)': riversGroup,
             'Markers & Fires': markersGroup
         },
         { collapsed: false }
@@ -675,12 +718,12 @@ function initMap() {
         div.innerHTML = `
             <strong>Six Rivers Africa</strong><br>
             <span style="display:inline-block;width:12px;height:3px;background:#FFD700;margin:4px 0;border-top:1px dashed #FFD700;"></span> Tanzania<br>
-            <span style="display:inline-block;width:12px;height:12px;background:${COLORS.zone1};border-radius:2px;"></span> Usangu GR<br>
-            <span style="display:inline-block;width:12px;height:12px;background:${COLORS.zone1_ihefu};border-radius:2px;"></span> Ihefu Core<br>
-            <span style="display:inline-block;width:12px;height:12px;background:${COLORS.zone2};border-radius:2px;"></span> Nyerere NP<br>
-            <span style="display:inline-block;width:12px;height:3px;background:#1565C0;margin:4px 0;"></span> Rivers<br>
-            <span style="color:${COLORS.danger};">&#128293;</span> Active Fire<br>
-            <span style="color:${COLORS.warning};font-weight:600;">PLACEHOLDER</span>
+            <span style="display:inline-block;width:12px;height:12px;background:${COLORS.zone2};border-radius:2px;"></span> Nyerere NP <small>(OSM)</small><br>
+            <span style="display:inline-block;width:12px;height:12px;background:#E65100;border-radius:2px;"></span> Selous GR <small>(OSM)</small><br>
+            <span style="display:inline-block;width:12px;height:12px;background:${COLORS.zone1};border-radius:2px;border:1px dashed ${COLORS.zone1};"></span> Usangu GR <small>(est.)</small><br>
+            <span style="display:inline-block;width:12px;height:12px;background:${COLORS.zone1_ihefu};border-radius:2px;border:1px dashed ${COLORS.zone1_ihefu};"></span> Ihefu Core <small>(est.)</small><br>
+            <span style="display:inline-block;width:12px;height:3px;background:#1565C0;margin:4px 0;"></span> Rivers <small>(OSM)</small><br>
+            <span style="color:${COLORS.danger};">&#128293;</span> Active Fire
         `;
         return div;
     };
